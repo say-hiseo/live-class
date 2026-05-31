@@ -29,7 +29,9 @@ dependencies {
 
 	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-test'
 	testImplementation 'com.h2database:h2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -40,7 +42,12 @@ tasks.named('test') {
 	systemProperty 'file.encoding', 'UTF-8'
 	jvmArgs '-Dfile.encoding=UTF-8'
 	jvmArgs '-XX:+EnableDynamicAgentLoading'
+	jvmArgs '-Xmx2g'
+	timeout = Duration.ofMinutes(10)
+	outputs.upToDateWhen { false }
 	testLogging {
-		events "passed", "skipped", "failed"
+		events "passed", "skipped", "failed", "standard_out", "standard_error"
+		showStandardStreams = true
 	}
+	jvmArgs '-Djava.net.preferIPv4Stack=true'
 }

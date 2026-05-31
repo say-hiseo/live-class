@@ -4,7 +4,6 @@ import com.example.enrollment.domain.course.model.Course;
 import com.example.enrollment.domain.course.port.out.CoursePort;
 import com.example.enrollment.domain.enrollment.dto.*;
 import com.example.enrollment.domain.enrollment.model.Enrollment;
-import com.example.enrollment.domain.enrollment.model.Waitlist;
 import com.example.enrollment.domain.enrollment.port.in.EnrollmentUseCase;
 import com.example.enrollment.domain.enrollment.port.out.EnrollmentPort;
 import com.example.enrollment.domain.enrollment.port.out.WaitlistPort;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -40,32 +38,45 @@ public class EnrollmentService implements EnrollmentUseCase {
 
     @Override
     public String requestEnrollment(Long userId, Long courseId) {
-        // 사용자/강의 존재 여부 확인하고
         User user = getUser(userId);
         if (!user.isStudent()) {
             throw new RestApiException(ErrorCode.NOT_STUDENT);
         }
         getCourse(courseId);
 
-        // 중복 신청 확인 후
         enrollmentPort.findActiveByCourseIdAndUserId(courseId, userId)
                 .ifPresent(e -> { throw new RestApiException(ErrorCode.ALREADY_ENROLLED); });
 
-        // Redis 큐에 요청 적재
         String requestId = UUID.randomUUID().toString();
         EnrollmentQueueRequest queueRequest = new EnrollmentQueueRequest(requestId, courseId, userId);
 
         try {
             String json = objectMapper.writeValueAsString(queueRequest);
-            redisTemplate.opsForList().rightPush(RedisQueueKey.enrollmentQueue(courseId), json);
+            String queueKey = RedisQueueKey.enrollmentQueue(courseId);
+            String resultKey = RedisQueueKey.enrollmentResult(requestId);
 
             EnrollmentResultResponse pending = new EnrollmentResultResponse(
                     requestId, "PENDING", "신청이 접수됐습니다. 잠시 후 결과를 확인해주세요.", null);
-            redisTemplate.opsForValue().set(
-                    RedisQueueKey.enrollmentResult(requestId),
-                    objectMapper.writeValueAsString(pending),
-                    30, TimeUnit.MINUTES
-            );
+            String pendingJson = objectMapper.writeValueAsString(pending);
+
+            try {
+                redisTemplate.executePipelined((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
+                    byte[] queueKeyBytes = queueKey.getBytes();
+                    byte[] resultKeyBytes = resultKey.getBytes();
+                    byte[] jsonBytes = json.getBytes();
+                    byte[] pendingBytes = pendingJson.getBytes();
+
+                    connection.listCommands().rPush(queueKeyBytes, jsonBytes);
+                    connection.stringCommands().setEx(resultKeyBytes, 1800L, pendingBytes);
+                    return null;
+                });
+            } catch (Exception pipelineEx) {
+                log.warn("파이프라이닝 실패, 개별 명령으로 폴백: {}", pipelineEx.getMessage());
+                redisTemplate.opsForList().rightPush(queueKey, json);
+                redisTemplate.opsForValue().set(resultKey, pendingJson,
+                        java.time.Duration.ofMinutes(30));
+            }
+
         } catch (JsonProcessingException e) {
             log.error("Redis 큐 적재 실패: {}", e.getMessage());
             throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR);

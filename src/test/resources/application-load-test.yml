@@ -4,30 +4,17 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
     properties:
       hibernate:
-        format_sql: false
-        dialect: org.hibernate.dialect.H2Dialect
-
+        jdbc:
+          batch_size: 1000
+        order_inserts: true
   data:
     redis:
       host: localhost
       port: 6379
-
   main:
     allow-bean-definition-overriding: true
-
-  task:
-    scheduling:
-      enabled: false
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /api-docs
