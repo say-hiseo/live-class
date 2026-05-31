@@ -9,6 +9,7 @@ import com.example.enrollment.domain.course.model.Course;
 import com.example.enrollment.domain.user.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,11 @@ class EnrollmentConcurrencyTest {
                 .deadline(LocalDate.now().plusDays(3))
                 .build());
         courseId = course.getId();
+    }
+
+    @AfterEach
+    void tearDown() {
+        redisTemplate.getConnectionFactory().getConnection().flushDb();
     }
 
     @Test
