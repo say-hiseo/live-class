@@ -135,7 +135,11 @@ public class EnrollmentService implements EnrollmentUseCase {
         if (enrollment.getStatus() == Enrollment.Status.PENDING) {
             enrollment.cancelByPending(request.getCancelReason());
         } else if (enrollment.getStatus() == Enrollment.Status.CONFIRMED) {
-            enrollment.cancelByConfirmed(request.getCancelReason());
+            try {
+                enrollment.cancelByConfirmed(request.getCancelReason());
+            } catch (IllegalStateException e) {
+                throw new RestApiException(ErrorCode.CANCEL_PERIOD_EXPIRED);
+            }
 
             Course course = coursePort.findByIdWithLock(enrollment.getCourseId())
                     .orElseThrow(() -> new RestApiException(ErrorCode.COURSE_NOT_FOUND));
