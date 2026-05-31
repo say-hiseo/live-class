@@ -50,7 +50,6 @@ public class CourseJpaEntity extends BaseEntity {
     @Column(nullable = false)
     private LocalDate deadline;
 
-    // JpaEntity → 도메인 모델 변환
     public Course toDomain() {
         return Course.builder()
                 .id(this.id)
@@ -69,7 +68,6 @@ public class CourseJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 모델 → JpaEntity 변환
     public static CourseJpaEntity fromDomain(Course course) {
         return CourseJpaEntity.builder()
                 .id(course.getId())
@@ -86,7 +84,6 @@ public class CourseJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 상태 동기화 (영속성 컨텍스트 활용)
     public void update(Course course) {
         this.title = course.getTitle();
         this.description = course.getDescription();

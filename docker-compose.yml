@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: enrollment-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: enrollment
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: app1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7.0
+    container_name: enrollment-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql-data:

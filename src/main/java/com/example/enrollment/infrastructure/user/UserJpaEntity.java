@@ -24,7 +24,6 @@ public class UserJpaEntity extends BaseEntity {
     @Column(nullable = false)
     private User.Role role;
 
-    // JpaEntity → 도메인 모델 변환
     public User toDomain() {
         return User.builder()
                 .id(this.id)
@@ -35,7 +34,6 @@ public class UserJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 모델 → JpaEntity 변환
     public static UserJpaEntity fromDomain(User user) {
         return UserJpaEntity.builder()
                 .id(user.getId())

@@ -36,7 +36,6 @@ public class WaitlistJpaEntity extends BaseEntity {
 
     private LocalDateTime cancelledAt;
 
-    // JpaEntity → 도메인 모델 변환
     public Waitlist toDomain() {
         return Waitlist.builder()
                 .id(this.id)
@@ -51,7 +50,6 @@ public class WaitlistJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 모델 → JpaEntity 변환
     public static WaitlistJpaEntity fromDomain(Waitlist waitlist) {
         return WaitlistJpaEntity.builder()
                 .id(waitlist.getId())
@@ -64,7 +62,6 @@ public class WaitlistJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 상태 동기화
     public void update(Waitlist waitlist) {
         this.status = waitlist.getStatus();
         this.promotedAt = waitlist.getPromotedAt();

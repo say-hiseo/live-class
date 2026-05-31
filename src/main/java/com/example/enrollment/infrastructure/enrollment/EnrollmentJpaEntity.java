@@ -36,7 +36,6 @@ public class EnrollmentJpaEntity extends BaseEntity {
     @Column(length = 255)
     private String cancelReason;
 
-    // JpaEntity → 도메인 모델 변환
     public Enrollment toDomain() {
         return Enrollment.builder()
                 .id(this.id)
@@ -51,7 +50,6 @@ public class EnrollmentJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 모델 → JpaEntity 변환
     public static EnrollmentJpaEntity fromDomain(Enrollment enrollment) {
         return EnrollmentJpaEntity.builder()
                 .id(enrollment.getId())
@@ -64,7 +62,6 @@ public class EnrollmentJpaEntity extends BaseEntity {
                 .build();
     }
 
-    // 도메인 상태 동기화
     public void update(Enrollment enrollment) {
         this.status = enrollment.getStatus();
         this.confirmedAt = enrollment.getConfirmedAt();
