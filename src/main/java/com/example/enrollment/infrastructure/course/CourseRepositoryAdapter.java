@@ -3,6 +3,8 @@ package com.example.enrollment.infrastructure.course;
 import com.example.enrollment.domain.course.model.Course;
 import com.example.enrollment.domain.course.port.out.CoursePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -40,15 +42,13 @@ public class CourseRepositoryAdapter implements CoursePort {
     }
 
     @Override
-    public List<Course> findAll(Course.Status status) {
+    public Page<Course> findAll(Course.Status status, Pageable pageable) {
         if (status == null) {
-            return courseJpaRepository.findAll().stream()
-                    .map(CourseJpaEntity::toDomain)
-                    .collect(Collectors.toList());
+            return courseJpaRepository.findAll(pageable)
+                    .map(CourseJpaEntity::toDomain);
         }
-        return courseJpaRepository.findAllByStatus(status).stream()
-                .map(CourseJpaEntity::toDomain)
-                .collect(Collectors.toList());
+        return courseJpaRepository.findAllByStatus(status, pageable)
+                .map(CourseJpaEntity::toDomain);
     }
 
     @Override

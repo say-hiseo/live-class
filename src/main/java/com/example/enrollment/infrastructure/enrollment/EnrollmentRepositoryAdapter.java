@@ -3,7 +3,9 @@ package com.example.enrollment.infrastructure.enrollment;
 import com.example.enrollment.domain.enrollment.model.Enrollment;
 import com.example.enrollment.domain.enrollment.port.out.EnrollmentPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,15 @@ public class EnrollmentRepositoryAdapter implements EnrollmentPort {
     }
 
     @Override
+    public Page<Enrollment> findAllByCourseId(Long courseId, Pageable pageable) {
+        return enrollmentJpaRepository.findAllByCourseIdAndStatus(
+                        courseId,
+                        Enrollment.Status.CONFIRMED,
+                        pageable)
+                .map(EnrollmentJpaEntity::toDomain);
+    }
+
+    @Override
     public Optional<Enrollment> findById(Long id) {
         return enrollmentJpaRepository.findById(id)
                 .map(EnrollmentJpaEntity::toDomain);
@@ -43,24 +54,9 @@ public class EnrollmentRepositoryAdapter implements EnrollmentPort {
     }
 
     @Override
-    public List<Enrollment> findAllByUserId(Long userId) {
-        return enrollmentJpaRepository.findAllByUserId(
-                        userId,
-                        PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"))
-                ).stream()
-                .map(EnrollmentJpaEntity::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Enrollment> findAllByCourseId(Long courseId) {
-        return enrollmentJpaRepository.findAllByCourseIdAndStatus(
-                        courseId,
-                        Enrollment.Status.CONFIRMED,
-                        PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "createdAt"))
-                ).stream()
-                .map(EnrollmentJpaEntity::toDomain)
-                .collect(Collectors.toList());
+    public Page<Enrollment> findAllByUserId(Long userId, Pageable pageable) {
+        return enrollmentJpaRepository.findAllByUserId(userId, pageable)
+                .map(EnrollmentJpaEntity::toDomain);
     }
 
     @Override
