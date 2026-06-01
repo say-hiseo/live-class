@@ -10,7 +10,6 @@ public class RedisQueueKey {
         return "result:enrollment:" + requestId;
     }
 
-    // 활성 큐 목록 관리용 Set 키
     public static String activeCourseQueues() {
         return "queue:enrollment:active-courses";
     }

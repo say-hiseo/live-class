@@ -37,7 +37,10 @@ public enum ErrorCode {
     COURSE_NOT_DELETABLE(HttpStatus.CONFLICT, "초안 상태의 강의만 삭제할 수 있습니다."),
 
     // 500 INTERNAL_SERVER_ERROR
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
+
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "종료일은 시작일 이후여야 합니다."),
+    INVALID_DEADLINE(HttpStatus.BAD_REQUEST, "모집 마감일은 시작일 이후, 종료일 이전이어야 합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

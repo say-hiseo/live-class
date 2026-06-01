@@ -126,7 +126,11 @@ public class EnrollmentService implements EnrollmentUseCase {
         }
 
         enrollment.confirm();
-        course.increaseEnrolledCount();
+        try {
+            course.increaseEnrolledCount();
+        } catch (IllegalStateException e) {
+            throw new RestApiException(ErrorCode.COURSE_FULL);
+        }
 
         enrollmentPort.save(enrollment);
         coursePort.save(course);
@@ -158,7 +162,11 @@ public class EnrollmentService implements EnrollmentUseCase {
 
             Course course = coursePort.findByIdWithLock(enrollment.getCourseId())
                     .orElseThrow(() -> new RestApiException(ErrorCode.COURSE_NOT_FOUND));
-            course.decreaseEnrolledCount();
+            try {
+                course.decreaseEnrolledCount();
+            } catch (IllegalStateException e) {
+                throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
             coursePort.save(course);
 
             waitlistPromotionService.promoteIfExists(enrollment.getCourseId());

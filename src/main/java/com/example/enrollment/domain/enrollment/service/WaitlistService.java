@@ -36,25 +36,20 @@ public class WaitlistService implements WaitlistUseCase {
 
         Course course = getCourse(courseId);
 
-        // OPEN 상태 확인하고
         if (course.getStatus() != Course.Status.OPEN) {
             throw new RestApiException(ErrorCode.COURSE_NOT_OPEN);
         }
 
-        // 정원이 꽉 찬 경우에만 대기열 등록
         if (!course.isFull()) {
             throw new RestApiException(ErrorCode.BAD_REQUEST);
         }
 
-        // 이미 활성 수강 신청이 있으면 대기열 등록 불가
         enrollmentPort.findActiveByCourseIdAndUserId(courseId, userId)
                 .ifPresent(e -> { throw new RestApiException(ErrorCode.ALREADY_ENROLLED); });
 
-        // 중복 대기열 등록 방지
         waitlistPort.findWaitingByCourseIdAndUserId(courseId, userId)
                 .ifPresent(w -> { throw new RestApiException(ErrorCode.ALREADY_WAITLISTED); });
 
-        // 대기 순번 부여하기
         int nextOrder = waitlistPort.countWaitingByCourseId(courseId) + 1;
 
         Waitlist waitlist = Waitlist.builder()
@@ -82,7 +77,11 @@ public class WaitlistService implements WaitlistUseCase {
             throw new RestApiException(ErrorCode.FORBIDDEN_ACCESS);
         }
 
-        waitlist.cancel();
+        try {
+            waitlist.cancel();
+        } catch (IllegalStateException e) {
+            throw new RestApiException(ErrorCode.INVALID_STATUS_TRANSITION);
+        }
         return WaitlistResponse.from(waitlistPort.save(waitlist));
     }
 

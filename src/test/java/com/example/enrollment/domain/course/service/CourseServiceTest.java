@@ -63,9 +63,9 @@ public class CourseServiceTest {
                 .capacity(30)
                 .enrolledCount(0)
                 .status(Course.Status.DRAFT)
-                .startDate(LocalDate.now().plusDays(10))
+                .startDate(LocalDate.now().plusDays(5))
                 .endDate(LocalDate.now().plusDays(40))
-                .deadline(LocalDate.now().plusDays(7))
+                .deadline(LocalDate.now().plusDays(20))
                 .build();
     }
 
@@ -77,9 +77,9 @@ public class CourseServiceTest {
         setField(request, "description", "설명");
         setField(request, "price", 50000);
         setField(request, "capacity", 30);
-        setField(request, "startDate", LocalDate.now().plusDays(10));
+        setField(request, "startDate", LocalDate.now().plusDays(5));
         setField(request, "endDate", LocalDate.now().plusDays(40));
-        setField(request, "deadline", LocalDate.now().plusDays(7));
+        setField(request, "deadline", LocalDate.now().plusDays(20));
 
         given(userPort.findById(1L)).willReturn(Optional.of(creator));
         given(coursePort.save(any(Course.class))).willReturn(course);
@@ -99,9 +99,9 @@ public class CourseServiceTest {
         setField(request, "description", "설명");
         setField(request, "price", 50000);
         setField(request, "capacity", 30);
-        setField(request, "startDate", LocalDate.now().plusDays(10));
+        setField(request, "startDate", LocalDate.now().plusDays(5));
         setField(request, "endDate", LocalDate.now().plusDays(40));
-        setField(request, "deadline", LocalDate.now().plusDays(7));
+        setField(request, "deadline", LocalDate.now().plusDays(20));
 
         given(userPort.findById(2L)).willReturn(Optional.of(student));
 
@@ -116,9 +116,9 @@ public class CourseServiceTest {
                 .id(1L).creatorId(1L).title("Spring Boot 입문")
                 .description("설명").price(50000).capacity(30).enrolledCount(0)
                 .status(Course.Status.OPEN)
-                .startDate(LocalDate.now().plusDays(10))
+                .startDate(LocalDate.now().plusDays(5))
                 .endDate(LocalDate.now().plusDays(40))
-                .deadline(LocalDate.now().plusDays(7))
+                .deadline(LocalDate.now().plusDays(20))
                 .build();
 
         given(userPort.findById(1L)).willReturn(Optional.of(creator));
@@ -161,9 +161,9 @@ public class CourseServiceTest {
                 .id(1L).creatorId(1L).title("Spring Boot 입문")
                 .description("설명").price(50000).capacity(30).enrolledCount(0)
                 .status(Course.Status.OPEN)
-                .startDate(LocalDate.now().plusDays(10))
+                .startDate(LocalDate.now().plusDays(5))
                 .endDate(LocalDate.now().plusDays(40))
-                .deadline(LocalDate.now().plusDays(7))
+                .deadline(LocalDate.now().plusDays(20))
                 .build();
 
         given(userPort.findById(1L)).willReturn(Optional.of(creator));

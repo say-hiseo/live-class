@@ -121,7 +121,12 @@ public class CourseService implements CourseUseCase {
             throw new RestApiException(ErrorCode.NOT_COURSE_OWNER);
         }
 
-        course.open();
+        try {
+            course.open();
+        } catch (IllegalStateException e) {
+            throw new RestApiException(ErrorCode.INVALID_STATUS_TRANSITION);
+        }
+
         return CourseResponse.from(coursePort.save(course));
     }
 
@@ -158,11 +163,11 @@ public class CourseService implements CourseUseCase {
     }
 
     private void validateCourseDates(LocalDate startDate, LocalDate endDate, LocalDate deadline) {
-        if (endDate.isBefore(startDate)) {
-            throw new RestApiException(ErrorCode.BAD_REQUEST);
+        if (!endDate.isAfter(startDate)) {
+            throw new RestApiException(ErrorCode.INVALID_DATE_RANGE);
         }
-        if (deadline.isAfter(endDate)) {
-            throw new RestApiException(ErrorCode.BAD_REQUEST);
+        if (!deadline.isAfter(startDate) || !deadline.isBefore(endDate)) {
+            throw new RestApiException(ErrorCode.INVALID_DEADLINE);
         }
     }
 
