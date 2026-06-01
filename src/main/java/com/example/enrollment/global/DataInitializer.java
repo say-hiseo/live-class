@@ -35,7 +35,6 @@ public class DataInitializer implements ApplicationRunner {
 
         log.info("샘플 데이터 초기화 시작...");
 
-        // 강사 생성
         UserJpaEntity creator1 = userJpaRepository.save(UserJpaEntity.builder()
                 .name("김강사")
                 .role(User.Role.CREATOR)
@@ -46,7 +45,6 @@ public class DataInitializer implements ApplicationRunner {
                 .role(User.Role.CREATOR)
                 .build());
 
-        // 수강생 생성
         UserJpaEntity student1 = userJpaRepository.save(UserJpaEntity.builder()
                 .name("박수강")
                 .role(User.Role.STUDENT)

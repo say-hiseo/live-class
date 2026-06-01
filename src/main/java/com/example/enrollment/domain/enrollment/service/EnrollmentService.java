@@ -35,6 +35,7 @@ public class EnrollmentService implements EnrollmentUseCase {
     private final WaitlistPort waitlistPort;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final WaitlistPromotionService waitlistPromotionService;
 
     @Override
     public String requestEnrollment(Long userId, Long courseId) {
@@ -157,7 +158,7 @@ public class EnrollmentService implements EnrollmentUseCase {
             course.decreaseEnrolledCount();
             coursePort.save(course);
 
-            promoteWaitlistIfExists(enrollment.getCourseId());
+            waitlistPromotionService.promoteIfExists(enrollment.getCourseId());
         } else {
             throw new RestApiException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
@@ -183,22 +184,6 @@ public class EnrollmentService implements EnrollmentUseCase {
             throw new RestApiException(ErrorCode.FORBIDDEN_ACCESS);
         }
         return EnrollmentResponse.from(enrollment);
-    }
-
-    // 대기자 자동 승격
-    private void promoteWaitlistIfExists(Long courseId) {
-        waitlistPort.findFirstWaitingByCourseId(courseId).ifPresent(waitlist -> {
-            waitlist.promote();
-            waitlistPort.save(waitlist);
-
-            Enrollment promoted = Enrollment.builder()
-                    .courseId(courseId)
-                    .userId(waitlist.getUserId())
-                    .status(Enrollment.Status.PENDING)
-                    .build();
-            enrollmentPort.save(promoted);
-            log.info("대기자 승격 완료 - userId: {}, courseId: {}", waitlist.getUserId(), courseId);
-        });
     }
 
     private User getUser(Long userId) {

@@ -15,7 +15,6 @@ import java.util.Optional;
 
 public interface CourseJpaRepository extends JpaRepository<CourseJpaEntity, Long> {
 
-    List<CourseJpaEntity> findAllByStatus(Course.Status status);
     Page<CourseJpaEntity> findAllByStatus(Course.Status status, Pageable pageable);
     Page<CourseJpaEntity> findAll(Pageable pageable);
     @Lock(LockModeType.PESSIMISTIC_WRITE)

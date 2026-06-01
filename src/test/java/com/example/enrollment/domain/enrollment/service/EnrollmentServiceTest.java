@@ -39,7 +39,7 @@ class EnrollmentServiceTest {
     @Mock private EnrollmentPort enrollmentPort;
     @Mock private CoursePort coursePort;
     @Mock private UserPort userPort;
-    @Mock private WaitlistPort waitlistPort;
+    @Mock private WaitlistPromotionService waitlistPromotionService;
     @Mock private RedisTemplate<String, String> redisTemplate;
     @Mock private ObjectMapper objectMapper;
     @Mock private ValueOperations<String, String> valueOperations;
@@ -154,7 +154,6 @@ class EnrollmentServiceTest {
         given(coursePort.findByIdWithLock(1L)).willReturn(Optional.of(openCourse));
         given(enrollmentPort.save(any())).willAnswer(inv -> inv.getArgument(0));
         given(coursePort.save(any())).willReturn(openCourse);
-        given(waitlistPort.findFirstWaitingByCourseId(1L)).willReturn(Optional.empty());
 
         EnrollmentCancelRequest request = new EnrollmentCancelRequest();
 

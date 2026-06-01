@@ -157,7 +157,6 @@ public class CourseService implements CourseUseCase {
                 .map(enrollment -> EnrolledStudentResponse.of(enrollment.getUserId(), enrollment));
     }
 
-    // 날짜 유효성 검사
     private void validateCourseDates(LocalDate startDate, LocalDate endDate, LocalDate deadline) {
         if (endDate.isBefore(startDate)) {
             throw new RestApiException(ErrorCode.BAD_REQUEST);

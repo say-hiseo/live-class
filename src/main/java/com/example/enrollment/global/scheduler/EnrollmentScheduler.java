@@ -1,11 +1,8 @@
 package com.example.enrollment.global.scheduler;
 
-import com.example.enrollment.domain.course.model.Course;
-import com.example.enrollment.domain.course.port.out.CoursePort;
 import com.example.enrollment.domain.enrollment.model.Enrollment;
-import com.example.enrollment.domain.enrollment.model.Waitlist;
 import com.example.enrollment.domain.enrollment.port.out.EnrollmentPort;
-import com.example.enrollment.domain.enrollment.port.out.WaitlistPort;
+import com.example.enrollment.domain.enrollment.service.WaitlistPromotionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,8 +17,7 @@ import java.util.List;
 public class EnrollmentScheduler {
 
     private final EnrollmentPort enrollmentPort;
-    private final CoursePort coursePort;
-    private final WaitlistPort waitlistPort;
+    private final WaitlistPromotionService waitlistPromotionService;
 
     // 1분마다 24시간 초과 PENDING 자동 취소
     @Scheduled(fixedDelay = 60000)
@@ -34,7 +30,7 @@ public class EnrollmentScheduler {
                 enrollment.cancelByTimeout();
                 enrollmentPort.save(enrollment);
 
-                promoteWaitlistIfExists(enrollment.getCourseId());
+                waitlistPromotionService.promoteIfExists(enrollment.getCourseId());
 
                 log.info("PENDING 자동 취소 완료 - enrollmentId: {}, userId: {}",
                         enrollment.getId(), enrollment.getUserId());
@@ -43,22 +39,5 @@ public class EnrollmentScheduler {
                         enrollment.getId(), e.getMessage());
             }
         }
-    }
-
-    private void promoteWaitlistIfExists(Long courseId) {
-        waitlistPort.findFirstWaitingByCourseId(courseId).ifPresent(waitlist -> {
-            waitlist.promote();
-            waitlistPort.save(waitlist);
-
-            Enrollment promoted = Enrollment.builder()
-                    .courseId(courseId)
-                    .userId(waitlist.getUserId())
-                    .status(Enrollment.Status.PENDING)
-                    .build();
-            enrollmentPort.save(promoted);
-
-            log.info("대기자 승격 완료 - userId: {}, courseId: {}",
-                    waitlist.getUserId(), courseId);
-        });
     }
 }
