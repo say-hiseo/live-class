@@ -9,13 +9,11 @@ import com.example.enrollment.domain.course.model.Course;
 import com.example.enrollment.domain.user.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -87,9 +85,25 @@ class EnrollmentConcurrencyTest {
         courseId = course.getId();
     }
 
+    @BeforeEach
+    void clearRedis() {
+        redisTemplate.getConnectionFactory()
+                .getConnection()
+                .serverCommands()
+                .flushDb();
+    }
+
     @AfterEach
     void tearDown() {
         redisTemplate.getConnectionFactory().getConnection().flushDb();
+    }
+
+    @AfterEach
+    void cleanup() {
+        redisTemplate.getConnectionFactory()
+                .getConnection()
+                .serverCommands()
+                .flushDb();
     }
 
     @Test
