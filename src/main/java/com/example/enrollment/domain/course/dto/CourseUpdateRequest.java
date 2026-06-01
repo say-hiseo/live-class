@@ -1,13 +1,17 @@
 package com.example.enrollment.domain.course.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class CourseUpdateRequest {
 
     @NotBlank(message = "강의 제목은 필수입니다.")

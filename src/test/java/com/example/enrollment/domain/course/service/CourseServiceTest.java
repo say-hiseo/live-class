@@ -72,14 +72,15 @@ public class CourseServiceTest {
     @Test
     @DisplayName("강의 등록 성공 - CREATOR는 강의를 등록할 수 있다")
     void createCourse_success() {
-        CourseCreateRequest request = new CourseCreateRequest();
-        setField(request, "title", "Spring Boot 입문");
-        setField(request, "description", "설명");
-        setField(request, "price", 50000);
-        setField(request, "capacity", 30);
-        setField(request, "startDate", LocalDate.now().plusDays(5));
-        setField(request, "endDate", LocalDate.now().plusDays(40));
-        setField(request, "deadline", LocalDate.now().plusDays(20));
+        CourseCreateRequest request = CourseCreateRequest.builder()
+                .title("Spring Boot 입문")
+                .description("설명")
+                .price(50000)
+                .capacity(30)
+                .startDate(LocalDate.now().plusDays(5))
+                .endDate(LocalDate.now().plusDays(40))
+                .deadline(LocalDate.now().plusDays(20))
+                .build();
 
         given(userPort.findById(1L)).willReturn(Optional.of(creator));
         given(coursePort.save(any(Course.class))).willReturn(course);
@@ -94,14 +95,15 @@ public class CourseServiceTest {
     @Test
     @DisplayName("강의 등록 실패 - STUDENT는 강의를 등록할 수 없다")
     void createCourse_fail_notCreator() {
-        CourseCreateRequest request = new CourseCreateRequest();
-        setField(request, "title", "Spring Boot 입문");
-        setField(request, "description", "설명");
-        setField(request, "price", 50000);
-        setField(request, "capacity", 30);
-        setField(request, "startDate", LocalDate.now().plusDays(5));
-        setField(request, "endDate", LocalDate.now().plusDays(40));
-        setField(request, "deadline", LocalDate.now().plusDays(20));
+        CourseCreateRequest request = CourseCreateRequest.builder()
+                .title("Spring Boot 입문")
+                .description("설명")
+                .price(50000)
+                .capacity(30)
+                .startDate(LocalDate.now().plusDays(5))
+                .endDate(LocalDate.now().plusDays(40))
+                .deadline(LocalDate.now().plusDays(20))
+                .build();
 
         given(userPort.findById(2L)).willReturn(Optional.of(student));
 

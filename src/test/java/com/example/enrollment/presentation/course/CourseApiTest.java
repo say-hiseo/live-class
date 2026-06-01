@@ -60,9 +60,9 @@ class CourseApiTest {
                 "description", "설명",
                 "price", 50000,
                 "capacity", 30,
-                "startDate", LocalDate.now().plusDays(10).toString(),
+                "startDate", LocalDate.now().plusDays(5).toString(),
                 "endDate", LocalDate.now().plusDays(40).toString(),
-                "deadline", LocalDate.now().plusDays(7).toString()
+                "deadline", LocalDate.now().plusDays(20).toString()
         );
 
         String createResult = mockMvc.perform(post("/courses")
@@ -101,9 +101,9 @@ class CourseApiTest {
                 "description", "설명",
                 "price", 50000,
                 "capacity", 30,
-                "startDate", LocalDate.now().plusDays(10).toString(),
+                "startDate", LocalDate.now().plusDays(5).toString(),
                 "endDate", LocalDate.now().plusDays(40).toString(),
-                "deadline", LocalDate.now().plusDays(7).toString()
+                "deadline", LocalDate.now().plusDays(20).toString()
         );
 
         mockMvc.perform(post("/courses")
@@ -122,9 +122,9 @@ class CourseApiTest {
                 "description", "설명",
                 "price", 50000,
                 "capacity", 30,
-                "startDate", LocalDate.now().plusDays(10).toString(),
+                "startDate", LocalDate.now().plusDays(5).toString(),
                 "endDate", LocalDate.now().plusDays(40).toString(),
-                "deadline", LocalDate.now().plusDays(7).toString()
+                "deadline", LocalDate.now().plusDays(20).toString()
         );
 
         String result = mockMvc.perform(post("/courses")
@@ -151,9 +151,9 @@ class CourseApiTest {
                 "description", "설명",
                 "price", 50000,
                 "capacity", 30,
-                "startDate", LocalDate.now().plusDays(10).toString(),
+                "startDate", LocalDate.now().plusDays(5).toString(),
                 "endDate", LocalDate.now().plusDays(40).toString(),
-                "deadline", LocalDate.now().plusDays(7).toString()
+                "deadline", LocalDate.now().plusDays(20).toString()
         );
 
         String result = mockMvc.perform(post("/courses")
