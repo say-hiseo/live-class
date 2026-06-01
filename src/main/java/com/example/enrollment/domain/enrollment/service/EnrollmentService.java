@@ -66,16 +66,19 @@ public class EnrollmentService implements EnrollmentUseCase {
                     byte[] resultKeyBytes = resultKey.getBytes();
                     byte[] jsonBytes = json.getBytes();
                     byte[] pendingBytes = pendingJson.getBytes();
+                    byte[] activeSetKeyBytes = RedisQueueKey.activeCourseQueues().getBytes();
+                    byte[] courseIdBytes = courseId.toString().getBytes();
 
                     connection.listCommands().rPush(queueKeyBytes, jsonBytes);
                     connection.stringCommands().setEx(resultKeyBytes, 1800L, pendingBytes);
+                    connection.setCommands().sAdd(activeSetKeyBytes, courseIdBytes);
                     return null;
                 });
             } catch (Exception pipelineEx) {
                 log.warn("파이프라이닝 실패, 개별 명령으로 폴백: {}", pipelineEx.getMessage());
                 redisTemplate.opsForList().rightPush(queueKey, json);
-                redisTemplate.opsForValue().set(resultKey, pendingJson,
-                        java.time.Duration.ofMinutes(30));
+                redisTemplate.opsForValue().set(resultKey, pendingJson, java.time.Duration.ofMinutes(30));
+                redisTemplate.opsForSet().add(RedisQueueKey.activeCourseQueues(), courseId.toString());
             }
 
         } catch (JsonProcessingException e) {

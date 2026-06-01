@@ -32,11 +32,20 @@ public class EnrollmentConsumer {
     @Scheduled(fixedDelay = 100)
     @Transactional
     public void processEnrollmentQueue() {
-        // 모든 강의 큐 키 조회
-        var keys = redisTemplate.keys("queue:enrollment:*");
-        if (keys == null || keys.isEmpty()) return;
+        String activeSetKey = RedisQueueKey.activeCourseQueues();
+        var courseIds = redisTemplate.opsForSet().members(activeSetKey);
+        if (courseIds == null || courseIds.isEmpty()) return;
 
-        for (String queueKey : keys) {
+        for (String courseId : courseIds) {
+            String queueKey = RedisQueueKey.enrollmentQueue(Long.parseLong(courseId));
+            Long queueSize = redisTemplate.opsForList().size(queueKey);
+
+            if (queueSize == null || queueSize == 0) {
+                // 큐가 비었으면 Set에서 제거
+                redisTemplate.opsForSet().remove(activeSetKey, courseId);
+                continue;
+            }
+
             processQueue(queueKey);
         }
     }
